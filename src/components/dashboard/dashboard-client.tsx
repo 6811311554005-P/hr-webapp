@@ -1,9 +1,21 @@
 "use client";
 
-import { signOut } from "next-auth/react";
-import { LogOut, Users, Briefcase, BarChart3, ChevronRight, PieChart, TrendingUp } from "lucide-react";
+// Third-party
 import Link from "next/link";
+import { signOut } from "next-auth/react";
+import {
+  BarChart3,
+  Briefcase,
+  ChevronRight,
+  LogOut,
+  PieChart,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+
+// Local
 import type { DashboardClientProps } from "@/src/types";
+import { DASHBOARD, MESSAGES, ROUTES, UI } from "@/src/lib/utils";
 
 export default function DashboardClient({ session, stats }: DashboardClientProps) {
   const handleLogout = async () => {
@@ -52,10 +64,10 @@ export default function DashboardClient({ session, stats }: DashboardClientProps
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mb-10">
           <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-            System Overview
+            {DASHBOARD.OVERVIEW}
           </h2>
           <p className="text-slate-600 mt-2">
-            Welcome back. Here's a snapshot of your organization's health today.
+            {DASHBOARD.OVERVIEW_DESC}
           </p>
         </div>
 
@@ -68,10 +80,10 @@ export default function DashboardClient({ session, stats }: DashboardClientProps
                 <Users className="w-6 h-6 text-indigo-600 group-hover:text-white" />
               </div>
               <span className="text-emerald-500 bg-emerald-50 px-2 py-1 rounded-lg text-xs font-bold">
-                +12%
+                {DASHBOARD.GROWTH_BADGE}
               </span>
             </div>
-            <p className="text-slate-500 text-sm font-medium">Total Personnel</p>
+            <p className="text-slate-500 text-sm font-medium">{DASHBOARD.STATS.TOTAL_PERSONNEL}</p>
             <p className="text-4xl font-black text-slate-900 mt-1">
               {stats.totalEmployees}
             </p>
@@ -84,9 +96,9 @@ export default function DashboardClient({ session, stats }: DashboardClientProps
                 <TrendingUp className="w-6 h-6 text-sky-600 group-hover:text-white" />
               </div>
             </div>
-            <p className="text-slate-500 text-sm font-medium">Average Age</p>
+            <p className="text-slate-500 text-sm font-medium">{DASHBOARD.STATS.AVERAGE_AGE}</p>
             <p className="text-4xl font-black text-slate-900 mt-1">
-              {stats.averageAge} <span className="text-sm font-normal text-slate-400">years</span>
+              {stats.averageAge} <span className="text-sm font-normal text-slate-400">{DASHBOARD.STATS.AVERAGE_AGE_UNIT}</span>
             </p>
           </div>
 
@@ -97,7 +109,7 @@ export default function DashboardClient({ session, stats }: DashboardClientProps
                 <PieChart className="w-6 h-6 text-violet-600 group-hover:text-white" />
               </div>
             </div>
-            <p className="text-slate-500 text-sm font-medium">Departments</p>
+            <p className="text-slate-500 text-sm font-medium">{DASHBOARD.STATS.DEPARTMENTS}</p>
             <p className="text-4xl font-black text-slate-900 mt-1">
               {stats.departmentStats.length}
             </p>
@@ -110,7 +122,7 @@ export default function DashboardClient({ session, stats }: DashboardClientProps
                 <BarChart3 className="w-6 h-6 text-rose-600 group-hover:text-white" />
               </div>
             </div>
-            <p className="text-slate-500 text-sm font-medium">New Hires (30d)</p>
+            <p className="text-slate-500 text-sm font-medium">{DASHBOARD.STATS.NEW_HIRES}</p>
             <p className="text-4xl font-black text-slate-900 mt-1">
               {stats.recentHires}
             </p>
@@ -121,9 +133,9 @@ export default function DashboardClient({ session, stats }: DashboardClientProps
           {/* Department Breakdown */}
           <div className="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
             <div className="flex items-center justify-between mb-8">
-              <h3 className="text-xl font-bold text-slate-900">Department Distribution</h3>
-              <Link href="/employees" className="text-indigo-600 hover:text-indigo-700 text-sm font-bold flex items-center gap-1 group">
-                View All <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <h3 className="text-xl font-bold text-slate-900">{DASHBOARD.SECTIONS.DEPARTMENT_DISTRIBUTION}</h3>
+              <Link href={ROUTES.EMPLOYEES} className="text-indigo-600 hover:text-indigo-700 text-sm font-bold flex items-center gap-1 group">
+                {DASHBOARD.SECTIONS.VIEW_ALL} <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
             <div className="space-y-6">
@@ -146,17 +158,17 @@ export default function DashboardClient({ session, stats }: DashboardClientProps
 
           {/* Quick Actions */}
           <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-3xl shadow-2xl shadow-indigo-200 p-8 text-white">
-            <h3 className="text-xl font-bold mb-6">Quick Actions</h3>
+            <h3 className="text-xl font-bold mb-6">{DASHBOARD.SECTIONS.QUICK_ACTIONS}</h3>
             <div className="space-y-4">
               <Link
-                href="/employees"
+                href={ROUTES.EMPLOYEES}
                 className="flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-2xl transition-all duration-200 group"
               >
                 <div className="flex items-center gap-3">
                   <div className="bg-white/20 p-2 rounded-xl">
                     <Users className="w-5 h-5 text-white" />
                   </div>
-                  <span className="font-semibold">Manage Employees</span>
+                  <span className="font-semibold">{DASHBOARD.SECTIONS.MANAGE_EMPLOYEES}</span>
                 </div>
                 <ChevronRight className="w-5 h-5 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
               </Link>
@@ -167,18 +179,18 @@ export default function DashboardClient({ session, stats }: DashboardClientProps
                   <div className="bg-white/10 p-2 rounded-xl">
                     <PieChart className="w-5 h-5 text-white" />
                   </div>
-                  <span className="font-semibold">Financial Reports</span>
+                  <span className="font-semibold">{DASHBOARD.SECTIONS.FINANCIAL_REPORTS}</span>
                 </div>
-                <span className="text-[10px] uppercase font-black tracking-widest bg-white/20 px-2 py-1 rounded-md">Locked</span>
+                <span className="text-[10px] uppercase font-black tracking-widest bg-white/20 px-2 py-1 rounded-md">{DASHBOARD.SECTIONS.LOCKED}</span>
               </div>
             </div>
             
             <div className="mt-12 p-6 bg-white/10 rounded-2xl border border-white/10">
-              <p className="text-sm font-medium text-indigo-100 mb-1">Current User</p>
+              <p className="text-sm font-medium text-indigo-100 mb-1">{MESSAGES.CURRENT_USER}</p>
               <p className="text-lg font-bold truncate">{session?.user?.username}</p>
               <div className="mt-4 pt-4 border-t border-white/10 flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-                <span className="text-xs font-bold uppercase tracking-widest text-indigo-200">System Online</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-indigo-200">{MESSAGES.SYSTEM_ONLINE}</span>
               </div>
             </div>
           </div>

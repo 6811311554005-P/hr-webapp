@@ -1,38 +1,49 @@
 /**
- * Seed script for creating test users
+ * Database seed script for creating test users
  * Run with: npx ts-node scripts/seed.ts
  */
 
-import { prisma } from "@/src/lib/prisma";
 import { hash } from "bcryptjs";
+import { prisma } from "@/src/lib/prisma";
+
+// ─── Test User Data ────────────────────────────────────────────────────────
+const TEST_USERS = [
+  {
+    username: "admin",
+    password: "admin123",
+    role: "admin",
+  },
+  {
+    username: "user",
+    password: "user123",
+    role: "employee",
+  },
+] as const;
 
 async function main() {
   try {
-    // Create test user (admin)
-    const testUser = await prisma.user.upsert({
-      where: { username: "admin" },
-      update: {},
-      create: {
-        username: "admin",
-        password: await hash("admin123", 12),
-        role: "admin",
-      },
-    });
+    console.log("🌱 Seeding test users...");
 
-    console.log("✅ Test user created/updated:", testUser);
+    for (const user of TEST_USERS) {
+      const hashedPassword = await hash(user.password, 12);
 
-    // Create another test user (employee)
-    const employeeUser = await prisma.user.upsert({
-      where: { username: "user" },
-      update: {},
-      create: {
-        username: "user",
-        password: await hash("user123", 12),
-        role: "employee",
-      },
-    });
+      const createdUser = await prisma.user.upsert({
+        where: { username: user.username },
+        update: {},
+        create: {
+          username: user.username,
+          password: hashedPassword,
+          role: user.role,
+        },
+      });
 
-    console.log("✅ Employee user created/updated:", employeeUser);
+      console.log(
+        `✅ ${user.role.charAt(0).toUpperCase() + user.role.slice(1)} user created/updated:`,
+        createdUser
+      );
+    }
+
+    console.log("✅ Seeding completed successfully!");
   } catch (error) {
     console.error("❌ Seed error:", error);
     process.exit(1);
@@ -42,3 +53,4 @@ async function main() {
 }
 
 main();
+

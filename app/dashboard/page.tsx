@@ -1,8 +1,11 @@
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
+
 import { authOptions } from "@/src/lib/auth";
 import { prisma } from "@/src/lib/prisma";
 import { DashboardClient } from "@/src/components/dashboard";
+import { calculateAge, isRecentHire } from "@/src/lib/utils/date-helpers";
+import { TIME, FORMATS } from "@/src/lib/utils";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -11,49 +14,44 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  // Fetch real data from Prisma
+  // Fetch total employees count
   const totalEmployees = await prisma.employee.count();
-  
+
+  // Fetch employees with dates for calculations
   const employees = await prisma.employee.findMany({
-    select: { birthDate: true, startDate: true }
+    select: { birthDate: true, startDate: true },
   });
 
-  // Calculate Average Age
-  const now = new Date();
+  // Calculate average age
   const ages = employees
-    .filter(e => e.birthDate)
-    .map(e => {
-      const birthDate = e.birthDate!;
-      let age = now.getFullYear() - birthDate.getFullYear();
-      const m = now.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && now.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      return age;
-    });
-  
-  const averageAge = ages.length > 0 
-    ? (ages.reduce((a, b) => a + b, 0) / ages.length).toFixed(1) 
-    : "N/A";
+    .filter((emp) => emp.birthDate)
+    .map((emp) => calculateAge(emp.birthDate!));
 
-  // Calculate Recent Hires (last 30 days)
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  const recentHires = employees.filter(e => new Date(e.startDate) >= thirtyDaysAgo).length;
+  const averageAge =
+    ages.length > 0
+      ? (ages.reduce((sum, age) => sum + age, 0) / ages.length).toFixed(
+          FORMATS.DECIMAL_PLACES.AVERAGE_AGE
+        )
+      : "N/A";
 
-  // Fetch Employees per Department
+  // Calculate recent hires (last 30 days)
+  const recentHires = employees.filter((emp) =>
+    isRecentHire(emp.startDate, TIME.DAYS.RECENT_HIRE_WINDOW)
+  ).length;
+
+  // Fetch employees per department
   const departmentStats = await prisma.employee.groupBy({
-    by: ['department'],
+    by: ["department"],
     _count: {
-      _all: true
-    }
+      _all: true,
+    },
   });
 
   const stats = {
     totalEmployees,
     averageAge,
     departmentStats,
-    recentHires
+    recentHires,
   };
 
   return <DashboardClient session={session} stats={stats} />;

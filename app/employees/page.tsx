@@ -1,11 +1,15 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+// Third-party
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { LogOut, Users, ArrowLeft, Trash2, Plus, Loader } from "lucide-react";
-import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
+import { ArrowLeft, Loader, LogOut, Trash2, Users } from "lucide-react";
+
+// Local
 import type { Employee } from "@/src/types";
+import { MESSAGES, ROUTES, STATUS, TABLE } from "@/src/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -37,9 +41,9 @@ export default function EmployeesPage() {
     }
   };
 
-  // Delete employee
+  // Delete employee with confirmation
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this employee?")) {
+    if (!window.confirm(STATUS.CONFIRMATION.DELETE_EMPLOYEE)) {
       return;
     }
 
@@ -63,25 +67,25 @@ export default function EmployeesPage() {
   };
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    } else if (status === "authenticated") {
+    if (status === STATUS.AUTH.UNAUTHENTICATED) {
+      router.push(ROUTES.LOGIN);
+    } else if (status === STATUS.AUTH.AUTHENTICATED) {
       fetchEmployees();
     }
   }, [status, router]);
 
-  if (status === "loading") {
+  if (status === STATUS.AUTH.LOADING) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600">{MESSAGES.LOADING}</p>
         </div>
       </div>
     );
   }
 
-  if (status === "unauthenticated") {
+  if (status === STATUS.AUTH.UNAUTHENTICATED) {
     return null;
   }
 
@@ -94,9 +98,9 @@ export default function EmployeesPage() {
       {/* Header */}
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4\">
             <Link
-              href="/dashboard"
+              href={ROUTES.DASHBOARD}
               className="p-2 hover:bg-gray-100 rounded-lg transition text-gray-600 hover:text-gray-900"
               title="Back to Dashboard"
             >
@@ -105,7 +109,7 @@ export default function EmployeesPage() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Employees</h1>
               <p className="text-gray-600 text-sm mt-1">
-                Total: {employees.length} employee{employees.length !== 1 ? "s" : ""}
+                {MESSAGES.EMPLOYEE_COUNT(employees.length)}
               </p>
             </div>
           </div>
@@ -149,14 +153,14 @@ export default function EmployeesPage() {
           {isLoading ? (
             <div className="p-12 text-center">
               <Loader className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-3" />
-              <p className="text-gray-600">Loading employees...</p>
+              <p className="text-gray-600">{MESSAGES.LOADING}</p>
             </div>
           ) : employees.length === 0 ? (
             <div className="p-12 text-center">
               <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-600 font-medium">No employees found</p>
+              <p className="text-gray-600 font-medium">{MESSAGES.NO_EMPLOYEES}</p>
               <p className="text-gray-500 text-sm mt-1">
-                Start by creating a new employee record.
+                {MESSAGES.NO_EMPLOYEES_DESC}
               </p>
             </div>
           ) : (
@@ -165,22 +169,22 @@ export default function EmployeesPage() {
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      Name
+                      {TABLE.HEADERS.NAME}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      Position
+                      {TABLE.HEADERS.POSITION}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      Department
+                      {TABLE.HEADERS.DEPARTMENT}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      Salary
+                      {TABLE.HEADERS.SALARY}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      Start Date
+                      {TABLE.HEADERS.START_DATE}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      Actions
+                      {TABLE.HEADERS.ACTIONS}
                     </th>
                   </tr>
                 </thead>
@@ -237,9 +241,9 @@ export default function EmployeesPage() {
           )}
         </div>
 
-        {/* Info Box */}
+        {/* API Documentation */}
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-bold text-blue-900 mb-2">API Endpoints</h3>
+          <h3 className="text-lg font-bold text-blue-900 mb-2">{MESSAGES.API_ENDPOINTS}</h3>
           <ul className="space-y-1 text-sm text-blue-800">
             <li>
               <span className="font-mono bg-white px-2 py-1 rounded">
