@@ -5,17 +5,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { LogOut, Users, ArrowLeft, Trash2, Plus, Loader } from "lucide-react";
 import Link from "next/link";
+import type { Employee } from "@/src/types";
 
-interface Employee {
-  id: number;
-  firstName: string;
-  lastName: string;
-  position: string;
-  department: string;
-  salary: number;
-  startDate: string;
-  birthDate?: string;
-}
+export const dynamic = "force-dynamic";
 
 export default function EmployeesPage() {
   const { data: session, status } = useSession();
@@ -94,7 +86,7 @@ export default function EmployeesPage() {
   }
 
   const handleLogout = async () => {
-    await signOut({ redirect: true, redirectTo: "/login" });
+    await signOut({ redirect: true, callbackUrl: "/login" });
   };
 
   return (

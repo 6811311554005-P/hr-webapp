@@ -3,7 +3,7 @@
  * Run with: npx ts-node scripts/seed.ts
  */
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/src/lib/prisma";
 import { hash } from "bcryptjs";
 
 async function main() {

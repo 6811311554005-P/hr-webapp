@@ -3,8 +3,8 @@
  * Run with: npx ts-node scripts/seed-employees.ts
  */
 
-import { prisma } from "../lib/prisma";
-import { Prisma } from "../app/generated/prisma/client";
+import { prisma } from "@/src/lib/prisma";
+import { Prisma } from "@/app/generated/prisma/client";
 
 async function main() {
   try {

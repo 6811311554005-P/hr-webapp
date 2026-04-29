@@ -1,8 +1,8 @@
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import DashboardClient from "./DashboardClient";
+import { authOptions } from "@/src/lib/auth";
+import { prisma } from "@/src/lib/prisma";
+import { DashboardClient } from "@/src/components/dashboard";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);

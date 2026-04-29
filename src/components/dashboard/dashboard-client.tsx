@@ -3,16 +3,7 @@
 import { signOut } from "next-auth/react";
 import { LogOut, Users, Briefcase, BarChart3, ChevronRight, PieChart, TrendingUp } from "lucide-react";
 import Link from "next/link";
-
-interface DashboardClientProps {
-  session: any;
-  stats: {
-    totalEmployees: number;
-    averageAge: string;
-    departmentStats: { department: string; _count: { _all: number } }[];
-    recentHires: number;
-  };
-}
+import type { DashboardClientProps } from "@/src/types";
 
 export default function DashboardClient({ session, stats }: DashboardClientProps) {
   const handleLogout = async () => {
@@ -136,7 +127,7 @@ export default function DashboardClient({ session, stats }: DashboardClientProps
               </Link>
             </div>
             <div className="space-y-6">
-              {stats.departmentStats.map((dept, index) => (
+              {stats.departmentStats.map((dept) => (
                 <div key={dept.department} className="relative">
                   <div className="flex justify-between mb-2">
                     <span className="text-sm font-bold text-slate-700">{dept.department}</span>

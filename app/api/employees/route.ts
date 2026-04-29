@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/src/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/src/lib/auth";
 
 // GET /api/employees - List all employees
 export async function GET(request: NextRequest) {
