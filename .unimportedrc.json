@@ -1,0 +1,42 @@
+{
+  "ignoreUnresolved": [],
+  "ignoreUnused": [
+    "lucide-react",
+    "next",
+    "react",
+    "react-dom",
+    "react-dropzone",
+    "xlsx"
+  ],
+  "ignoreUnimported": [
+    "C:\\xampp\\htdocs\\hr-app\\app\\api\\auth\\[...nextauth]\\route.ts",
+    "C:\\xampp\\htdocs\\hr-app\\app\\api\\employees\\[id]\\route.ts",
+    "C:\\xampp\\htdocs\\hr-app\\app\\api\\employees\\route.ts",
+    "C:\\xampp\\htdocs\\hr-app\\app\\api\\health\\route.ts",
+    "C:\\xampp\\htdocs\\hr-app\\app\\dashboard\\DashboardClient.tsx",
+    "C:\\xampp\\htdocs\\hr-app\\app\\dashboard\\page.tsx",
+    "C:\\xampp\\htdocs\\hr-app\\app\\employees\\page.tsx",
+    "C:\\xampp\\htdocs\\hr-app\\app\\generated\\prisma\\browser.ts",
+    "C:\\xampp\\htdocs\\hr-app\\app\\generated\\prisma\\client.ts",
+    "C:\\xampp\\htdocs\\hr-app\\app\\generated\\prisma\\commonInputTypes.ts",
+    "C:\\xampp\\htdocs\\hr-app\\app\\generated\\prisma\\enums.ts",
+    "C:\\xampp\\htdocs\\hr-app\\app\\generated\\prisma\\internal\\class.ts",
+    "C:\\xampp\\htdocs\\hr-app\\app\\generated\\prisma\\internal\\prismaNamespace.ts",
+    "C:\\xampp\\htdocs\\hr-app\\app\\generated\\prisma\\internal\\prismaNamespaceBrowser.ts",
+    "C:\\xampp\\htdocs\\hr-app\\app\\generated\\prisma\\models.ts",
+    "C:\\xampp\\htdocs\\hr-app\\app\\generated\\prisma\\models\\Employee.ts",
+    "C:\\xampp\\htdocs\\hr-app\\app\\generated\\prisma\\models\\User.ts",
+    "C:\\xampp\\htdocs\\hr-app\\app\\layout.tsx",
+    "C:\\xampp\\htdocs\\hr-app\\app\\login\\page.tsx",
+    "C:\\xampp\\htdocs\\hr-app\\app\\page.tsx",
+    "C:\\xampp\\htdocs\\hr-app\\app\\providers.tsx",
+    "C:\\xampp\\htdocs\\hr-app\\lib\\auth-utils.ts",
+    "C:\\xampp\\htdocs\\hr-app\\lib\\auth.ts",
+    "C:\\xampp\\htdocs\\hr-app\\lib\\prisma.ts",
+    "C:\\xampp\\htdocs\\hr-app\\middleware.ts",
+    "C:\\xampp\\htdocs\\hr-app\\next.config.ts",
+    "C:\\xampp\\htdocs\\hr-app\\prisma.config.ts",
+    "C:\\xampp\\htdocs\\hr-app\\scripts\\seed-employees.ts",
+    "C:\\xampp\\htdocs\\hr-app\\scripts\\seed.ts"
+  ]
+}
