@@ -24,7 +24,6 @@ export function calculateAge(birthDate: Date): number {
  * Check if date is within recent hire window (last N days)
  */
 export function isRecentHire(startDate: Date, windowDays: number): boolean {
-  const today = new Date();
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - windowDays);
 

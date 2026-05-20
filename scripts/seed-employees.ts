@@ -1,9 +1,11 @@
 /**
  * Database seed script for creating test employees
- * Run with: npx ts-node scripts/seed-employees.ts
+ * Run with: npx tsx scripts/seed-employees.ts
+ * 
+ * Note: This script requires departments and positions to exist first.
+ * Run `npm run db:seed` first to set up the base data.
  */
 
-import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/src/lib/prisma";
 
 // ─── Test Employee Data ────────────────────────────────────────────────────
@@ -11,93 +13,108 @@ const TEST_EMPLOYEES = [
   {
     firstName: "John",
     lastName: "Doe",
-    position: "Senior Engineer",
-    department: "IT",
-    salary: new Prisma.Decimal("95000"),
-    startDate: new Date("2022-01-15"),
+    employeeCode: "EMP-T001",
+    salary: 95000,
+    hireDate: new Date("2022-01-15"),
     birthDate: new Date("1985-05-10"),
   },
   {
     firstName: "Jane",
     lastName: "Smith",
-    position: "Product Manager",
-    department: "Product",
-    salary: new Prisma.Decimal("90000"),
-    startDate: new Date("2022-06-01"),
+    employeeCode: "EMP-T002",
+    salary: 90000,
+    hireDate: new Date("2022-06-01"),
     birthDate: new Date("1990-08-22"),
   },
   {
     firstName: "Mike",
     lastName: "Johnson",
-    position: "UI Designer",
-    department: "Design",
-    salary: new Prisma.Decimal("75000"),
-    startDate: new Date("2023-03-10"),
+    employeeCode: "EMP-T003",
+    salary: 75000,
+    hireDate: new Date("2023-03-10"),
     birthDate: new Date("1995-11-05"),
   },
   {
     firstName: "Sarah",
     lastName: "Williams",
-    position: "Marketing Manager",
-    department: "Marketing",
-    salary: new Prisma.Decimal("80000"),
-    startDate: new Date("2022-11-20"),
+    employeeCode: "EMP-T004",
+    salary: 80000,
+    hireDate: new Date("2022-11-20"),
     birthDate: new Date("1988-03-15"),
   },
   {
     firstName: "Tom",
     lastName: "Brown",
-    position: "DevOps Engineer",
-    department: "IT",
-    salary: new Prisma.Decimal("100000"),
-    startDate: new Date("2021-05-30"),
+    employeeCode: "EMP-T005",
+    salary: 100000,
+    hireDate: new Date("2021-05-30"),
     birthDate: new Date("1982-12-01"),
   },
   {
     firstName: "Emily",
     lastName: "Davis",
-    position: "QA Tester",
-    department: "Quality Assurance",
-    salary: new Prisma.Decimal("65000"),
-    startDate: new Date("2023-09-01"),
+    employeeCode: "EMP-T006",
+    salary: 65000,
+    hireDate: new Date("2023-09-01"),
     birthDate: new Date("1998-01-20"),
   },
   {
     firstName: "Alex",
     lastName: "Miller",
-    position: "Frontend Engineer",
-    department: "IT",
-    salary: new Prisma.Decimal("85000"),
-    startDate: new Date("2023-02-15"),
+    employeeCode: "EMP-T007",
+    salary: 85000,
+    hireDate: new Date("2023-02-15"),
     birthDate: new Date("1993-06-30"),
   },
   {
     firstName: "Lisa",
     lastName: "Taylor",
-    position: "HR Manager",
-    department: "HR",
-    salary: new Prisma.Decimal("70000"),
-    startDate: new Date("2022-08-10"),
+    employeeCode: "EMP-T008",
+    salary: 70000,
+    hireDate: new Date("2022-08-10"),
     birthDate: new Date("1987-09-12"),
   },
-] as const;
+];
 
 async function main() {
   try {
     console.log("🌱 Seeding test employees...");
 
-    // Clear existing employees
-    const deletedCount = await prisma.employee.deleteMany({});
-    console.log(`🗑️  Deleted ${deletedCount.count} existing employees`);
+    // Get first department and position to assign
+    const department = await prisma.department.findFirst();
+    const position = await prisma.position.findFirst();
+
+    if (!department || !position) {
+      console.error("❌ No departments or positions found. Run `npm run db:seed` first.");
+      process.exit(1);
+    }
+
+    console.log(`📁 Using department: ${department.name} (ID: ${department.id})`);
+    console.log(`💼 Using position: ${position.name} (ID: ${position.id})`);
 
     // Create employees
     for (const employee of TEST_EMPLOYEES) {
+      // Check if employee code already exists
+      const existing = await prisma.employee.findUnique({
+        where: { employeeCode: employee.employeeCode },
+      });
+
+      if (existing) {
+        console.log(`⏩ Skipped: ${employee.firstName} ${employee.lastName} (already exists)`);
+        continue;
+      }
+
       const createdEmployee = await prisma.employee.create({
-        data: employee as Prisma.EmployeeCreateInput,
+        data: {
+          ...employee,
+          departmentId: department.id,
+          positionId: position.id,
+          status: "ACTIVE",
+        },
       });
 
       console.log(
-        `✅ Created: ${createdEmployee.firstName} ${createdEmployee.lastName}`
+        `✅ Created: ${createdEmployee.firstName} ${createdEmployee.lastName} [${createdEmployee.employeeCode}]`
       );
     }
 

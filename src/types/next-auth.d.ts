@@ -2,7 +2,7 @@
  * NextAuth type extensions
  */
 
-import type { DefaultSession, DefaultUser, JWT } from "next-auth";
+import type { DefaultSession, DefaultUser } from "next-auth";
 
 declare module "next-auth" {
   interface User extends DefaultUser {

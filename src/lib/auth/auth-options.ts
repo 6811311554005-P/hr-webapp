@@ -1,9 +1,10 @@
-import { NextAuthOptions } from "next-auth";
+import type { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { prisma } from "@/src/lib/prisma";
+import { logAuditEvent } from "@/src/lib/audit/logger";
 
-export const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthConfig = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -17,29 +18,50 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
+          const username = String(credentials.username);
+          const password = String(credentials.password);
           const user = await prisma.user.findUnique({
-            where: { username: credentials.username },
+            where: { email: username },
           });
 
-          if (!user) {
-            throw new Error("User not found");
+          if (!user || !user.isActive) {
+            await logAuditEvent({
+              action: "AUTH_FAILED",
+              entity: "User",
+              statusCode: 401,
+              metadata: { username },
+            });
+            return null;
           }
 
-          const isPasswordValid = await compare(
-            credentials.password,
-            user.password
-          );
+          const isPasswordValid = await compare(password, user.passwordHash);
 
           if (!isPasswordValid) {
-            throw new Error("Invalid password");
+            await logAuditEvent({
+              action: "AUTH_FAILED",
+              entity: "User",
+              entityId: user.id,
+              statusCode: 401,
+              metadata: { username },
+            });
+            return null;
           }
+
+          await logAuditEvent({
+            action: "AUTH_LOGIN",
+            entity: "User",
+            entityId: user.id,
+            statusCode: 200,
+            metadata: { username, role: user.role },
+          });
 
           return {
             id: user.id.toString(),
-            username: user.username,
+            email: user.email,
+            username: user.email,
             role: user.role,
           };
-        } catch (error) {
+        } catch {
           throw new Error("Authentication failed");
         }
       },
@@ -52,16 +74,18 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as any).role;
-        token.username = (user as any).username;
+        token.email = user.email;
+        token.username = user.username;
+        token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).id = token.id as string;
-        (session.user as any).role = token.role as string;
-        (session.user as any).username = token.username as string;
+        session.user.id = token.id;
+        session.user.email = token.email ?? "";
+        session.user.username = token.username;
+        session.user.role = token.role;
       }
       return session;
     },
@@ -69,5 +93,5 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
 };

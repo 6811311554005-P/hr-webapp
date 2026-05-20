@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/src/lib/prisma";
+import { logAuditEvent } from "@/src/lib/audit/logger";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     // Simple query to verify connection
     await prisma.$queryRaw`SELECT 1`;
@@ -11,6 +12,17 @@ export async function GET() {
       prisma.user.count(),
       prisma.employee.count(),
     ]);
+
+    await logAuditEvent({
+      action: "HEALTH_CHECK",
+      entity: "System",
+      statusCode: 200,
+      request: req,
+      metadata: {
+        users: userCount,
+        employees: employeeCount,
+      },
+    });
 
     return NextResponse.json({
       status: "ok",
@@ -23,6 +35,16 @@ export async function GET() {
     });
   } catch (error) {
     console.error("DB health check failed:", error);
+    await logAuditEvent({
+      action: "ERROR",
+      entity: "System",
+      statusCode: 500,
+      request: req,
+      metadata: {
+        route: "GET /api/health",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+    });
     return NextResponse.json(
       {
         status: "error",

@@ -7,8 +7,11 @@ const publicRoutes = ["/login", "/api/auth"];
 // Routes that require authentication
 const protectedRoutes = ["/dashboard", "/employees"];
 
-export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request });
+export async function proxy(request: NextRequest) {
+  const token = await getToken({
+    req: request,
+    secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  });
   const { pathname } = request.nextUrl;
 
   // Check if the current path is public
@@ -20,7 +23,7 @@ export async function middleware(request: NextRequest) {
   );
 
   // ─── Redirect unauthenticated users to login ───────────────────────────────
-  if (isProtectedRoute && !token) {
+  if (!isPublicRoute && isProtectedRoute && !token) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("from", pathname); // Optional: remember where they came from
     return NextResponse.redirect(loginUrl);
